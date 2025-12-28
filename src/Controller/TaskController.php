@@ -15,11 +15,29 @@ class TaskController {
     }
 
     public function list() {
+        $tasks = $this->repository->findAll();
         require __DIR__ . '/../View/task_list.php';
     }
 
-    public function add(){
-        echo "Форма добавления задачи";
+    public function add(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title = trim($_POST['title'] ?? '');
+            
+            if (empty($title)) {
+                $error = 'Название задачи не может быть пустым';
+                require __DIR__ . '/../View/add.php';
+                return;
+            }
+            
+            $task = new Task($title);
+            $this->repository->add($task);
+            
+            header('Location: ?route=task/list');
+            exit;
+        }
+        
+        require __DIR__ . '/../View/add.php';
     }
 
     public function getTasks()  {
